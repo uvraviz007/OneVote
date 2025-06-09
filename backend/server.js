@@ -20,7 +20,7 @@ app.use(express.json());
 })();
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Welcome to the Next Generation Voting System');
 });
 app.get('/users', userRoute);
 
