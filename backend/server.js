@@ -1,36 +1,21 @@
-import express from 'express';
+const express = require('express')
 const app = express();
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser'
-app.use(bodyParser.json());
+const db = require('./db');
+require('dotenv').config();
+
+const bodyParser = require('body-parser'); 
+app.use(bodyParser.json()); // req.body
+const PORT = process.env.PORT || 3000;
+
+// Import the router files
+const userRoutes = require('./routes/userRoutes');
+const candidateRoutes = require('./routes/candidateRoutes');
+
+// Use the routers
+app.use('/user', userRoutes);
+app.use('/candidate', candidateRoutes);
 
 
-
-dotenv.config();
-const port = process.env.PORT || 3000;
-const uri = process.env.MONGODB_URI;
-
-app.use(express.json());
-
-// (async () => {
-//   try {
-//     await mongoose.connect(uri);
-//     console.log("Connected to DataBase");
-//   } catch (error) {
-//     console.log(error);
-//   }
-// })();
-
-// app.get('/', (req, res) => {
-//   res.send('Welcome to the Next Generation Voting System');
-// });
-
-
-
-
-
-
-app.listen(port, () => {
-  console.log(`Sever listening on port ${port}`);
-});
+app.listen(PORT, ()=>{
+    console.log('listening on port 3000');
+})
