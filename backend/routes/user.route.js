@@ -20,8 +20,8 @@ router.post('/signup',async(req,res)=>{
         res.status(200).json({response: response,
             token: token
         });
-    }catch{
-        console.log(err);
+    }catch(error){
+        console.error(error);
         res.status(500).json({error:'internal server error'});
     }
 })
@@ -29,16 +29,17 @@ router.post('/signup',async(req,res)=>{
 router.post('/login', async(req, res) => {
     try{
         // Extract aadharCardNumber and password from request body
-        const {aadharCardNumber, password} = req.body;
-
+        const {adharId, password} = req.body;
+        console.log('aadharCardNumber:', adharId);
+        console.log('password:', password);
         // Check if aadharCardNumber or password is missing
-        if (!aadharCardNumber || !password) {
+        if (!adharId || !password) {
             return res.status(400).json({ error: 'Aadhar Card Number and password are required' });
         }
 
         // Find the user by aadharCardNumber
-        const user = await User.findOne({aadharCardNumber: aadharCardNumber});
-
+        const user = await User.findOne({adharId});
+        console.log('user:', user);
         // If user does not exist or password does not match, return error
         if( !user || !(await user.comparePassword(password))){
             return res.status(401).json({error: 'Invalid Aadhar Card Number or Password'});
