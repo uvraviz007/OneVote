@@ -44,7 +44,6 @@ const  userSchema=new mongoose.Schema({
 
 });
 
-
 userSchema.pre('save', async function(next){
     const person = this;
 
@@ -75,7 +74,7 @@ userSchema.methods.comparePassword = async function(candidatePassword){
     }
 }
 const User=mongoose.model('User',userSchema);
-module.export=User;
+module.exports=User;
 
 
 

@@ -12,7 +12,7 @@ const  candidateSchema=new mongoose.Schema({
         type: Number,
         required:true
     },
-    votes:{
+    votes:[{
         user:{
             type:mongoose.Schema.Types.ObjectId,
             ref:'User',
@@ -22,14 +22,14 @@ const  candidateSchema=new mongoose.Schema({
             type:Date,
             default:Date.now()
         }
-    },
+    }],
     voteCount:{
         type:Number,
         default:0
     }
 });
 const Candidate=mongoose.model('Candidate',candidateSchema);
-module.export=Candidate;
+module.exports=Candidate;
 
 
 

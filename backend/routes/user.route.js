@@ -2,43 +2,42 @@ const express = require('express')
 const router =express.Router();
 const User=require('./../models/user.model');
 
-
 const {jwtAuthMiddleware,generateToken}=require('./../jwt');
 
-router.post('/signup',async(req,res)=>{
-    try{
-        const data=req.body
-        const newUser=new User(data);
-        const response=await newUser.save();
+router.post('/signup', async (req, res) => {
+    try {
+        const data = req.body;
+        const newUser = new User(data);
+        const response = await newUser.save();
         console.log('data saved');
-        const  payload={
-            id:response.id
-        }
+
+        const payload = {
+            id: response.id
+        };
         console.log(JSON.stringify(payload));
-        const token=generateToken(payload);
-        console.log("Token is",token );
-        res.status(200).json({response: response,
-            token: token
-        });
-    }catch{
+        const token = generateToken(payload);
+        console.log("Token is", token);
+        res.status(200).json({ response: response, token: token });
+    } catch (err) {
         console.log(err);
-        res.status(500).json({error:'internal server error'});
+        res.status(500).json({ error: 'internal server error' });
     }
-})
+});
 
 router.post('/login', async(req, res) => {
     try{
         // Extract aadharCardNumber and password from request body
-        const {aadharCardNumber, password} = req.body;
-
+        const {adharId, password} = req.body;
+        console.log('aadharCardNumber:', adharId);
+        console.log('password:', password);
         // Check if aadharCardNumber or password is missing
-        if (!aadharCardNumber || !password) {
+        if (!adharId || !password) {
             return res.status(400).json({ error: 'Aadhar Card Number and password are required' });
         }
 
         // Find the user by aadharCardNumber
-        const user = await User.findOne({aadharCardNumber: aadharCardNumber});
-
+        const user = await User.findOne({adharId});
+        console.log('user:', user);
         // If user does not exist or password does not match, return error
         if( !user || !(await user.comparePassword(password))){
             return res.status(401).json({error: 'Invalid Aadhar Card Number or Password'});
@@ -57,6 +56,8 @@ router.post('/login', async(req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+     
+
 
 
 

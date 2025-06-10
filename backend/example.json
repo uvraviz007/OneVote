@@ -1,0 +1,21 @@
+{
+  "name": "Ravi Kumar",
+  "age": 25,
+  "email": "ravi@example.com",
+  "mobile": 9876543210,
+  "adharId": 123456789012,
+  "address": "123 Main Street, Jaipur, Rajasthan",
+  "password": "securePassword123",
+  "role": "voter",
+  "isVoted": false
+},
+{
+  "name": "Alice Sharma",
+  "party": "Progressive Alliance",
+  "age": 42,
+  "votes": {
+    "user": "665f25e45619c74c2fda56b7",
+    "votingTime": "2025-06-10T07:30:00.000Z"
+  },
+  "voteCount": 1
+}
