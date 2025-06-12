@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // ✅ Import Link for navigation
+import { useNavigate } from 'react-router-dom'; // for navigation
 
 export default function Login() {
   const [formData, setFormData] = useState({
     adharId: '',
     password: ''
   });
+
+  const navigate = useNavigate(); // navigation hook
 
   const handleChange = (e) => {
     setFormData({
@@ -16,8 +18,22 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Login Credentials:', formData);
-    // Call backend API here if needed
+
+    // Basic validation (simulated)
+    if (formData.adharId.length === 12 && formData.password.length > 0) {
+      // ✅ Save login status
+      localStorage.setItem("isLoggedIn", "true");
+
+      // Optionally: store Aadhar ID or role
+      localStorage.setItem("adharId", formData.adharId);
+
+      alert("Login successful!");
+
+      // ✅ Redirect to account page
+      navigate('/account');
+    } else {
+      alert("Invalid Aadhar ID or Password");
+    }
   };
 
   return (
@@ -58,12 +74,9 @@ export default function Login() {
           Login
         </button>
 
-        {/* ✅ Signup link */}
         <div className="text-center mt-3">
           <span>Don't have an account? </span>
-          <Link to="/signup" className="text-decoration-none">
-            Sign up
-          </Link>
+          <a href="/signup" className="text-decoration-none">Sign up</a>
         </div>
       </form>
     </div>
