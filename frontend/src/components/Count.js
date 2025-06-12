@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 export default function Count() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const [voteCounts, setVoteCounts] = useState([
+  const voteCounts = [
     { name: 'Party A', votes: 0 },
     { name: 'Party B', votes: 0 },
     { name: 'Party C', votes: 0 }
-  ]);
+  ];
 
   // Update current time every second
   useEffect(() => {

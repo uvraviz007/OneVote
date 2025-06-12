@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React  from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Account() {
   // Simulated fetched data from API
-  const [userData, setUserData] = useState({
+  const userData = {
     name: 'Ravi Sharma',
     dob: '2002-08-15',
     address: 'MNNIT Allahabad',
     role: 'voter',      // or 'admin'
     voted: false
-  });
+  };
 
   
 

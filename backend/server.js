@@ -4,11 +4,17 @@ const db = require('./db');
 require('dotenv').config();
 const userRoutes = require('./routes/user.route.js');
 const candidateRoutes = require('./routes/candidate.route.js');
+const cors = require('cors'); 
 
+
+app.use(cors({
+  origin: 'http://localhost:3000', // or 5173 if you're using Vite
+  credentials: true
+}));
 
 const bodyParser = require('body-parser'); 
 app.use(bodyParser.json()); // req.body
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 
 app.use('/user', userRoutes);
@@ -22,7 +28,7 @@ app.use('/candidate', candidateRoutes);
 
 
 app.get('/', (req,res)=>{
-    console.log("welcome to voting machine");
+    // console.log("welcome to voting machine");
     res.send("welocme to 5th election fare");
 });
 
