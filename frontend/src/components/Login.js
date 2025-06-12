@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; // ✅ Import Link for navigation
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    email: '',
+    adharId: '',
     password: ''
   });
 
@@ -39,7 +40,6 @@ export default function Login() {
             onChange={handleChange}
             placeholder="Enter 12-digit Aadhar number"
           />
-          {/* <small className="text-muted">Must be exactly 12 digits</small> */}
         </div>
 
         <div className="mb-3">
@@ -57,6 +57,14 @@ export default function Login() {
         <button type="submit" className="btn btn-primary w-100">
           Login
         </button>
+
+        {/* ✅ Signup link */}
+        <div className="text-center mt-3">
+          <span>Don't have an account? </span>
+          <Link to="/signup" className="text-decoration-none">
+            Sign up
+          </Link>
+        </div>
       </form>
     </div>
   );
