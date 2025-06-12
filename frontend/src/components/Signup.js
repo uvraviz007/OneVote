@@ -8,90 +8,82 @@ export default function Signup() {
     mobile: '',
     adharId: '',
     address: '',
+    password: '',
     role: 'voter',
     voted: 'false',
   });
 
   const handleChange = (e) => {
-    setFormData({ 
+    setFormData({
       ...formData,
-      [e.target.name]: e.target.value 
+      [e.target.name]: e.target.value
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Data Submitted:', formData);
-    // You can replace this with API call to check uniqueness of adharId etc.
+    console.log('Submitted Data:', formData);
+    // Handle form data submission
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Signup Form</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
+    <div className="container mt-5 text-black">
+      <h2 className="mb-4 text-center">Signup Form</h2>
+      <form onSubmit={handleSubmit} className="border p-4 rounded shadow-sm bg-white">
 
-        <label>Name:</label>
-        <input type="text" name="name" required value={formData.name} onChange={handleChange} />
+        <div className="mb-3">
+          <label className="form-label">Name</label>
+          <input type="text" className="form-control" name="name" required value={formData.name} onChange={handleChange} />
+        </div>
 
-        <label>Date of Birth:</label>
-        <input type="date" name="dob" required value={formData.dob} onChange={handleChange} />
+        <div className="mb-3">
+          <label className="form-label">Date of Birth</label>
+          <input type="date" className="form-control" name="dob" required value={formData.dob} onChange={handleChange} />
+        </div>
 
-        <label>Email:</label>
-        <input type="email" name="email" required value={formData.email} onChange={handleChange} />
+        <div className="mb-3">
+          <label className="form-label">Email</label>
+          <input type="email" className="form-control" name="email"  value={formData.email} onChange={handleChange} />
+        </div>
 
-        <label>Mobile:</label>
-        <input type="tel" name="mobile" required value={formData.mobile} onChange={handleChange} />
+        <div className="mb-3">
+          <label className="form-label">Mobile</label>
+          <input type="tel" className="form-control" name="mobile" required value={formData.mobile} onChange={handleChange} />
+        </div>
 
-        <label>Aadhar ID:</label>
-        <input type="text" name="adharId" required value={formData.adharId} onChange={handleChange} />
+        <div className="mb-3">
+          <label className="form-label">Aadhar ID</label>
+          <input type="text" className="form-control" name="adharId" required value={formData.adharId} onChange={handleChange} />
+        </div>
 
-        <label>Address:</label>
-        <textarea name="address" required value={formData.address} onChange={handleChange} />
+        <div className="mb-3">
+          <label className="form-label">Address</label>
+          <textarea className="form-control" name="address" required value={formData.address} onChange={handleChange}></textarea>
+        </div>
 
-        <label>Role:</label>
-        <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="voter">Voter</option>
-          <option value="admin">Admin</option>
-        </select>
+        <div className="mb-3">
+          <label className="form-label">Password</label>
+          <input type="password" className="form-control" name="password" required value={formData.password} onChange={handleChange} />
+        </div>
 
-        <label>Voted:</label>
-        <select name="voted" value={formData.voted} onChange={handleChange}>
-          <option value="false">False</option>
-          <option value="true">True</option>
-        </select>
+        <div className="mb-3">
+          <label className="form-label">Role</label>
+          <select className="form-select" name="role" value={formData.role} onChange={handleChange}>
+            <option value="voter">Voter</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
 
-        <button type="submit" style={styles.button}>Register</button>
+        <div className="mb-3">
+          <label className="form-label">Voted</label>
+          <select className="form-select" name="voted" value={formData.voted} onChange={handleChange}>
+            <option value="false">False</option>
+            <option value="true">True</option>
+          </select>
+        </div>
+
+        <button type="submit" className="btn btn-primary w-100">Register</button>
       </form>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '500px',
-    margin: '40px auto',
-    padding: '30px',
-    backgroundColor: '#f2f2f2',
-    borderRadius: '10px',
-    fontFamily: 'Arial',
-    boxShadow: '0 0 8px rgba(0,0,0,0.2)'
-  },
-  heading: {
-    textAlign: 'center',
-    marginBottom: '20px'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px'
-  },
-  button: {
-    marginTop: '15px',
-    padding: '10px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer'
-  }
-};
