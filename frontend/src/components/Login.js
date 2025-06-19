@@ -7,6 +7,7 @@ export default function Login() {
     password: ''
   });
 
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // navigation hook
 
   const handleChange = (e) => {
@@ -16,23 +17,43 @@ export default function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    // Basic validation (simulated)
-    if (formData.adharId.length === 12 && formData.password.length > 0) {
-      // ✅ Save login status
-      localStorage.setItem("isLoggedIn", "true");
+    try {
+      const response = await fetch('http://localhost:5000/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
 
-      // Optionally: store Aadhar ID or role
-      localStorage.setItem("adharId", formData.adharId);
+      const result = await response.json();
 
-      alert("Login successful!");
+      if (response.ok) {
+        // Store the JWT token
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('adharId', formData.adharId);
 
-      // ✅ Redirect to account page
-      navigate('/account');
-    } else {
-      alert("Invalid Aadhar ID or Password");
+        console.log('Login successful - localStorage set');
+        console.log('Dispatching loginStateChanged event');
+
+        // Dispatch custom event to notify navbar
+        window.dispatchEvent(new Event('loginStateChanged'));
+
+        alert('Login successful!');
+        navigate('/account');
+      } else {
+        alert(result.error || 'Login failed! Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error connecting to the server. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,8 +91,12 @@ export default function Login() {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary w-100">
-          Login
+        <button 
+          type="submit" 
+          className="btn btn-primary w-100"
+          disabled={loading}
+        >
+          {loading ? 'Logging in...' : 'Login'}
         </button>
 
         <div className="text-center mt-3">

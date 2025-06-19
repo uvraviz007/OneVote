@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -9,9 +10,10 @@ export default function Signup() {
     adharId: '',
     address: '',
     password: '',
-    role: 'voter',
-    voted: 'false',
   });
+
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -21,31 +23,33 @@ export default function Signup() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const response = await fetch('http://localhost:3001/user/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    });
+    try {
+      const response = await fetch('http://localhost:5000/user/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (response.ok) {
-      alert(result.message || 'Signup successful!');
-      // Optional: redirect user to login
-      // navigate('/login');
-    } else {
-      alert(result.message || 'Signup failed!');
+      if (response.ok) {
+        alert('Signup successful! Please login to continue.');
+        navigate('/login');
+      } else {
+        alert(result.error || 'Signup failed! Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error connecting to the server. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error connecting to the server');
-  }
-};
+  };
 
   return (
     <div className="container mt-5 text-black">
@@ -73,7 +77,8 @@ export default function Signup() {
             name="age"
             className="form-control"
             required
-            min="1"
+            min="18"
+            max="120"
             value={formData.age}
             onChange={handleChange}
           />
@@ -85,6 +90,7 @@ export default function Signup() {
             type="email"
             className="form-control"
             name="email"
+            required
             value={formData.email}
             onChange={handleChange}
           />
@@ -97,8 +103,11 @@ export default function Signup() {
             className="form-control"
             name="mobile"
             required
+            pattern="[0-9]{10}"
+            maxLength="10"
             value={formData.mobile}
             onChange={handleChange}
+            placeholder="Enter 10-digit mobile number"
           />
         </div>
 
@@ -109,8 +118,11 @@ export default function Signup() {
             className="form-control"
             name="adharId"
             required
+            pattern="[0-9]{12}"
+            maxLength="12"
             value={formData.adharId}
             onChange={handleChange}
+            placeholder="Enter 12-digit Aadhar number"
           />
         </div>
 
@@ -120,6 +132,7 @@ export default function Signup() {
             className="form-control"
             name="address"
             required
+            rows="3"
             value={formData.address}
             onChange={handleChange}
           ></textarea>
@@ -132,40 +145,24 @@ export default function Signup() {
             className="form-control"
             name="password"
             required
+            minLength="6"
             value={formData.password}
             onChange={handleChange}
           />
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">Role</label>
-          <select
-            className="form-select"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-          >
-            <option value="voter">Voter</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Voted</label>
-          <select
-            className="form-select"
-            name="voted"
-            value={formData.voted}
-            onChange={handleChange}
-          >
-            <option value="false">False</option>
-            <option value="true">True</option>
-          </select>
-        </div>
-
-        <button type="submit" className="btn btn-primary w-100">
-          Register
+        <button 
+          type="submit" 
+          className="btn btn-primary w-100"
+          disabled={loading}
+        >
+          {loading ? 'Registering...' : 'Register'}
         </button>
+
+        <div className="text-center mt-3">
+          <span>Already have an account? </span>
+          <a href="/login" className="text-decoration-none">Login</a>
+        </div>
       </form>
     </div>
   );

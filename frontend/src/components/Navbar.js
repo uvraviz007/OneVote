@@ -1,14 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
-  // Check login status on load
+  // Check login status on load and listen for changes
   useEffect(() => {
-    const status = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(status);
+    const checkLoginStatus = () => {
+      const status = localStorage.getItem("isLoggedIn") === "true";
+      console.log('Navbar checking login status:', status);
+      setIsLoggedIn(status);
+    };
+
+    // Check initial status
+    checkLoginStatus();
+
+    // Listen for storage changes (when login/logout happens in other components)
+    const handleStorageChange = (e) => {
+      if (e.key === "isLoggedIn") {
+        console.log('Storage changed for isLoggedIn:', e.newValue);
+        checkLoginStatus();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also listen for custom events
+    const handleLoginChange = () => {
+      console.log('Login state changed event received');
+      checkLoginStatus();
+    };
+
+    window.addEventListener('loginStateChanged', handleLoginChange);
+
+    // Force check every 2 seconds to catch any missed updates
+    const interval = setInterval(checkLoginStatus, 2000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('loginStateChanged', handleLoginChange);
+      clearInterval(interval);
+    };
   }, []);
+
+  const handleLogout = () => {
+    console.log('Logout clicked');
+    // Clear all stored data
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("token");
+    localStorage.removeItem("adharId");
+    setIsLoggedIn(false);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('loginStateChanged'));
+    
+    navigate('/');
+  };
+
+  // Debug: Log current state
+  console.log('Navbar render - isLoggedIn:', isLoggedIn);
+  console.log('Navbar render - localStorage isLoggedIn:', localStorage.getItem("isLoggedIn"));
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -39,17 +91,14 @@ export default function Navbar() {
             {isLoggedIn ? (
               <button
                 className="btn btn-outline-danger btn-sm"
-                onClick={() => {
-                  localStorage.removeItem("isLoggedIn");
-                  window.location.reload(); // reload to update navbar
-                }}
+                onClick={handleLogout}
               >
                 Logout
               </button>
             ) : (
               <>
                 <Link className="nav-link" to="/login">Login</Link>
-                
+                <Link className="nav-link" to="/signup">Signup</Link>
               </>
             )}
           </div>
