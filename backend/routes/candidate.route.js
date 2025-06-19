@@ -85,6 +85,26 @@ router.delete('/:candidateID', jwtAuthMiddleware, async (req, res)=>{
     }
 })
 
+// vote count 
+router.get('/vote/count', async (req, res) => {
+    try{
+        // Find all candidates and sort them by voteCount in descending order
+        const candidates = await Candidate.find().sort({voteCount: 'desc'});
+
+        // Map the candidates to return their name, party, and voteCount
+        const voteRecord = candidates.map((data) => ({
+            name: data.name,
+            party: data.party,
+            count: data.voteCount
+        }));
+
+        return res.status(200).json(voteRecord);
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+});
+
 
 // let's start voting
 router.get('/vote/:candidateID', jwtAuthMiddleware, async (req, res)=>{
@@ -129,27 +149,6 @@ router.get('/vote/:candidateID', jwtAuthMiddleware, async (req, res)=>{
 });
 
 
-// vote count 
-router.get('/vote/count', async (req, res) => {
-    try{
-        // Find all candidates and sort them by voteCount in descending order
-        const candidate = await Candidate.find().sort({voteCount: 'desc'});
-
-        // Map the candidates to only return their name and voteCount
-        const voteRecord = candidate.map((data)=>{
-            return {
-                party: data.party,
-                count: data.voteCount
-            }
-        });
-
-        return res.status(200).json(voteRecord);
-    }catch(err){
-        console.log(err);
-        res.status(500).json({error: 'Internal Server Error'});
-    }
-});
-
 // Get List of all candidates with only name and party fields
 router.get('/', async (req, res) => {
     try {
@@ -157,6 +156,20 @@ router.get('/', async (req, res) => {
         const candidates = await Candidate.find({}, 'name party -_id');
 
         // Return the list of candidates
+        res.status(200).json(candidates);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Get all candidates with complete details
+router.get('/allcandidates', async (req, res) => {
+    try {
+        // Find all candidates with all fields
+        const candidates = await Candidate.find();
+
+        // Return the list of candidates with complete details
         res.status(200).json(candidates);
     } catch (err) {
         console.error(err);

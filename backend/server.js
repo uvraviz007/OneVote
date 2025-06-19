@@ -1,11 +1,13 @@
 const express = require('express')
 const app = express();
-const db = require('./db');
+// const db = require('./db');
+const {connectDB} = require('./db');
 require('dotenv').config();
 const userRoutes = require('./routes/user.route.js');
 const candidateRoutes = require('./routes/candidate.route.js');
 const cors = require('cors'); 
 
+connectDB();
 
 app.use(cors({
   origin: 'http://localhost:3000', // or 5173 if you're using Vite
@@ -14,7 +16,7 @@ app.use(cors({
 
 const bodyParser = require('body-parser'); 
 app.use(bodyParser.json()); // req.body
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 
 app.use('/user', userRoutes);
