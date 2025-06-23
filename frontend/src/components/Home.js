@@ -130,37 +130,50 @@ export default function Home() {
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">Candidates</h2>
-      <div className="d-flex justify-content-center flex-wrap gap-3">
-        {candidates.length > 0 ? (
-          candidates.map((candidate) => (
-            <div key={candidate._id} className="card" style={{ width: '18rem' }}>
-              <img src="/img.jpg" className="card-img-top" alt="Candidate" />
-              <div className="card-body">
-                <h5 className="card-title">{candidate.name}</h5>
-                <p className="card-text">
-                  <strong>Party:</strong> {candidate.party}<br />
-                  <strong>Age:</strong> {candidate.age} years
-                </p>
-                {hasVoted ? (
-                  <button className="btn btn-secondary w-100" disabled>
-                    You have Voted!!
-                  </button>
-                ) : (
-                  <button 
-                    className="btn btn-primary w-100"
-                    onClick={() => handleVote(candidate)}
-                  >
-                    Vote
-                  </button>
-                )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="text-center w-100">
-            <p>No candidates available at the moment.</p>
-          </div>
-        )}
+      <div className="table-responsive">
+        <table className="table table-bordered align-middle">
+          <thead className="table-light">
+            <tr>
+              <th scope="col" className="text-center">Profile</th>
+              <th scope="col">Name</th>
+              <th scope="col">Age</th>
+              <th scope="col">Party</th>
+              <th scope="col" className="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {candidates.length > 0 ? (
+              candidates.map((candidate) => (
+                <tr key={candidate._id}>
+                  <td className="text-center">
+                    <img src="/img.jpg" alt="Candidate" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }} />
+                  </td>
+                  <td>{candidate.name}</td>
+                  <td>{candidate.age} years</td>
+                  <td>{candidate.party}</td>
+                  <td className="text-center">
+                    {hasVoted ? (
+                      <button className="btn btn-secondary" disabled>
+                        You have Voted!!
+                      </button>
+                    ) : (
+                      <button 
+                        className="btn btn-primary"
+                        onClick={() => handleVote(candidate)}
+                      >
+                        Vote
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center">No candidates available at the moment.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
