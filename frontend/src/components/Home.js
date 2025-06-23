@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
+  const navigate = useNavigate();
+
+  // Handle session expiry
+  const handleSessionExpiry = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('isLoggedIn');
+    alert('Your session has expired. Please login again.');
+    navigate('/login');
+  };
 
   // Fetch candidates
   useEffect(() => {
@@ -45,26 +55,33 @@ export default function Home() {
           if (data.user && data.user.isVoted) {
             setHasVoted(true);
           }
+        } else {
+          const data = await response.json();
+          if (data.requireLogin || data.tokenExpired) {
+            handleSessionExpiry();
+          }
         }
       } catch (error) {
-        // ignore
+        console.error('Profile fetch error:', error);
       }
     };
     fetchUserProfile();
-  }, []);
+  }, [navigate]);
 
   const handleVote = async (candidate) => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
       alert('Please login to vote!');
+      navigate('/login');
       return;
     }
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (!isLoggedIn) {
       alert('Please login to vote!');
+      navigate('/login');
       return;
     }
+
     // Show confirmation dialog with candidate name validation
     const userCandidateName = prompt(`Please enter the candidate name to confirm your vote for:\n\nCandidate: ${candidate.name}`);
     if (userCandidateName === null) {
@@ -78,6 +95,7 @@ export default function Home() {
     if (!confirmed) {
       return;
     }
+
     try {
       const response = await fetch(`http://localhost:5000/candidate/vote/${candidate._id}`, {
         method: 'GET',
@@ -87,11 +105,14 @@ export default function Home() {
         }
       });
       const result = await response.json();
+      
       if (response.ok) {
         alert('Vote recorded successfully!');
         setHasVoted(true);
       } else {
-        if (response.status === 400 && result.message === 'You have already voted') {
+        if (result.requireLogin || result.tokenExpired) {
+          handleSessionExpiry();
+        } else if (response.status === 400 && result.message === 'You have already voted') {
           alert('You have already voted!');
           setHasVoted(true);
         } else if (response.status === 403 && result.message === 'admin is not allowed') {

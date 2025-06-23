@@ -6,11 +6,17 @@ const jwtAuthMiddleware = (req, res, next) => {
 
     // first check request headers has authorization or not
     const authorization = req.headers.authorization
-    if(!authorization) return res.status(401).json({ error: 'Token Not Found' });
+    if(!authorization) return res.status(401).json({ 
+        error: 'Token Not Found',
+        requireLogin: true 
+    });
 
     // Extract the jwt token from the request headers
     const token = req.headers.authorization.split(' ')[1];
-    if(!token) return res.status(401).json({ error: 'Unauthorized' });
+    if(!token) return res.status(401).json({ 
+        error: 'Unauthorized',
+        requireLogin: true 
+    });
 
     try{
         // Verify the JWT token
@@ -21,7 +27,17 @@ const jwtAuthMiddleware = (req, res, next) => {
         next();
     }catch(err){
         console.error(err);
-        res.status(401).json({ error: 'Invalid token' });
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ 
+                error: 'Session expired. Please login again.',
+                requireLogin: true,
+                tokenExpired: true
+            });
+        }
+        res.status(401).json({ 
+            error: 'Invalid token',
+            requireLogin: true 
+        });
     }
 }
 
