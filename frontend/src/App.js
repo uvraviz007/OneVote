@@ -8,6 +8,7 @@ import Signup from './components/Signup';
 import Account from './components/Account';
 import ChangePassword from './components/ChangePassword';
 import Count from './components/Count'; 
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/account" element={<Account />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/vote-count" element={<Count />} />
+        <Route path="/admin-panel" element={<AdminPanel />} />
       </Routes>
     </Router>
   );

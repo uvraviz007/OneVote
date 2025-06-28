@@ -3,14 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   // Check login status on load and listen for changes
   useEffect(() => {
     const checkLoginStatus = () => {
       const status = localStorage.getItem("isLoggedIn") === "true";
+      const adminStatus = localStorage.getItem("isAdmin") === "true";
       console.log('Navbar checking login status:', status);
+      console.log('Navbar checking admin status:', adminStatus);
       setIsLoggedIn(status);
+      setIsAdmin(adminStatus);
     };
 
     // Check initial status
@@ -18,8 +22,8 @@ export default function Navbar() {
 
     // Listen for storage changes (when login/logout happens in other components)
     const handleStorageChange = (e) => {
-      if (e.key === "isLoggedIn") {
-        console.log('Storage changed for isLoggedIn:', e.newValue);
+      if (e.key === "isLoggedIn" || e.key === "isAdmin") {
+        console.log('Storage changed for:', e.key, e.newValue);
         checkLoginStatus();
       }
     };
@@ -50,7 +54,9 @@ export default function Navbar() {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("token");
     localStorage.removeItem("adharId");
+    localStorage.removeItem("isAdmin");
     setIsLoggedIn(false);
+    setIsAdmin(false);
     
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('loginStateChanged'));
@@ -60,7 +66,9 @@ export default function Navbar() {
 
   // Debug: Log current state
   console.log('Navbar render - isLoggedIn:', isLoggedIn);
+  console.log('Navbar render - isAdmin:', isAdmin);
   console.log('Navbar render - localStorage isLoggedIn:', localStorage.getItem("isLoggedIn"));
+  console.log('Navbar render - localStorage isAdmin:', localStorage.getItem("isAdmin"));
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -74,15 +82,24 @@ export default function Navbar() {
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/vote-count">Vote Count</Link>
-            </li>
-            {isLoggedIn && (
+            {!isAdmin && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/">Home</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/vote-count">Vote Count</Link>
+                </li>
+              </>
+            )}
+            {isLoggedIn && !isAdmin && (
               <li className="nav-item">
                 <Link className="nav-link" to="/account">Account</Link>
+              </li>
+            )}
+            {isLoggedIn && isAdmin && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin-panel">Admin Panel</Link>
               </li>
             )}
           </ul>

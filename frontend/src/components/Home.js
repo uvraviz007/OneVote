@@ -6,15 +6,23 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   // Handle session expiry
   const handleSessionExpiry = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('isAdmin');
     alert('Your session has expired. Please login again.');
     navigate('/login');
   };
+
+  // Check admin status
+  useEffect(() => {
+    const adminStatus = localStorage.getItem('isAdmin') === 'true';
+    setIsAdmin(adminStatus);
+  }, []);
 
   // Fetch candidates
   useEffect(() => {
@@ -79,6 +87,13 @@ export default function Home() {
     if (!isLoggedIn) {
       alert('Please login to vote!');
       navigate('/login');
+      return;
+    }
+
+    // Check if user is admin
+    const adminStatus = localStorage.getItem('isAdmin') === 'true';
+    if (adminStatus) {
+      alert('Admin users are not allowed to vote!');
       return;
     }
 
@@ -173,7 +188,11 @@ export default function Home() {
                   <td>{candidate.age} years</td>
                   <td>{candidate.party}</td>
                   <td className="text-center">
-                    {hasVoted ? (
+                    {isAdmin ? (
+                      <button className="btn btn-secondary" disabled>
+                        Admin Cannot Vote
+                      </button>
+                    ) : hasVoted ? (
                       <button className="btn btn-secondary" disabled>
                         You have Voted!!
                       </button>

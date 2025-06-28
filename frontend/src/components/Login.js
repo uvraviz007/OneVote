@@ -44,8 +44,34 @@ export default function Login() {
         // Dispatch custom event to notify navbar
         window.dispatchEvent(new Event('loginStateChanged'));
 
-        alert('Login successful!');
-        navigate('/account');
+        // Check if user is admin by fetching profile
+        const profileResponse = await fetch('http://localhost:5000/user/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${result.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          if (profileData.user && profileData.user.role === 'admin') {
+            // Store admin status
+            localStorage.setItem('isAdmin', 'true');
+            alert('Login successful! Welcome Admin!');
+            navigate('/admin-panel');
+          } else {
+            // Store user status
+            localStorage.setItem('isAdmin', 'false');
+            alert('Login successful!');
+            navigate('/account');
+          }
+        } else {
+          // Fallback to regular user flow
+          localStorage.setItem('isAdmin', 'false');
+          alert('Login successful!');
+          navigate('/account');
+        }
       } else {
         alert(result.error || 'Login failed! Please check your credentials.');
       }
