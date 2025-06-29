@@ -14,6 +14,8 @@ export default function AdminPanel() {
     party: '',
     age: ''
   });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   // Handle session expiry
   const handleSessionExpiry = () => {
@@ -64,22 +66,41 @@ export default function AdminPanel() {
     });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddCandidate = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     
+    if (!selectedImage) {
+      alert('Please select an image for the candidate');
+      return;
+    }
+    
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('party', formData.party);
+      formDataToSend.append('age', formData.age);
+      formDataToSend.append('image', selectedImage);
+
       const response = await fetch('http://localhost:5000/candidate', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          name: formData.name,
-          party: formData.party,
-          age: parseInt(formData.age)
-        })
+        body: formDataToSend
       });
 
       const result = await response.json();
@@ -88,6 +109,8 @@ export default function AdminPanel() {
         alert('Candidate added successfully!');
         setShowAddForm(false);
         setFormData({ name: '', party: '', age: '' });
+        setSelectedImage(null);
+        setImagePreview(null);
         // Refresh candidates list
         window.location.reload();
       } else {
@@ -109,17 +132,20 @@ export default function AdminPanel() {
     const token = localStorage.getItem('token');
     
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('party', formData.party);
+      formDataToSend.append('age', formData.age);
+      if (selectedImage) {
+        formDataToSend.append('image', selectedImage);
+      }
+
       const response = await fetch(`http://localhost:5000/candidate/${editingCandidate._id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          name: formData.name,
-          party: formData.party,
-          age: parseInt(formData.age)
-        })
+        body: formDataToSend
       });
 
       const result = await response.json();
@@ -128,6 +154,8 @@ export default function AdminPanel() {
         alert('Candidate updated successfully!');
         setEditingCandidate(null);
         setFormData({ name: '', party: '', age: '' });
+        setSelectedImage(null);
+        setImagePreview(null);
         // Refresh candidates list
         window.location.reload();
       } else {
@@ -186,12 +214,16 @@ export default function AdminPanel() {
       party: candidate.party,
       age: candidate.age.toString()
     });
+    setSelectedImage(null);
+    setImagePreview(candidate.image?.url || null);
   };
 
   const handleCancel = () => {
     setShowAddForm(false);
     setEditingCandidate(null);
     setFormData({ name: '', party: '', age: '' });
+    setSelectedImage(null);
+    setImagePreview(null);
   };
 
   if (loading) {
@@ -236,7 +268,7 @@ export default function AdminPanel() {
           <div className="card-body">
             <form onSubmit={editingCandidate ? handleUpdateCandidate : handleAddCandidate}>
               <div className="row">
-                <div className="col-md-4 mb-3">
+                <div className="col-md-3 mb-3">
                   <label className="form-label">Name</label>
                   <input
                     type="text"
@@ -248,7 +280,7 @@ export default function AdminPanel() {
                     placeholder="Enter candidate name"
                   />
                 </div>
-                <div className="col-md-4 mb-3">
+                <div className="col-md-3 mb-3">
                   <label className="form-label">Party</label>
                   <input
                     type="text"
@@ -260,7 +292,7 @@ export default function AdminPanel() {
                     placeholder="Enter party name"
                   />
                 </div>
-                <div className="col-md-4 mb-3">
+                <div className="col-md-3 mb-3">
                   <label className="form-label">Age</label>
                   <input
                     type="number"
@@ -274,7 +306,29 @@ export default function AdminPanel() {
                     placeholder="Enter age"
                   />
                 </div>
+                <div className="col-md-3 mb-3">
+                  <label className="form-label">Profile Image</label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    required={!editingCandidate}
+                  />
+                </div>
               </div>
+              {imagePreview && (
+                <div className="mb-3">
+                  <label className="form-label">Image Preview:</label>
+                  <div>
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '50%' }}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="d-flex gap-2">
                 <button type="submit" className="btn btn-success">
                   {editingCandidate ? 'Update' : 'Add'} Candidate
@@ -305,7 +359,14 @@ export default function AdminPanel() {
               candidates.map((candidate) => (
                 <tr key={candidate._id}>
                   <td className="text-center">
-                    <img src="/img.jpg" alt="Candidate" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }} />
+                    <img 
+                      src={candidate.image?.url || "/img.jpg"} 
+                      alt={candidate.name} 
+                      style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }}
+                      onError={(e) => {
+                        e.target.src = "/img.jpg";
+                      }}
+                    />
                   </td>
                   <td>{candidate.name}</td>
                   <td>{candidate.age} years</td>

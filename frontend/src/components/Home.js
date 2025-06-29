@@ -182,7 +182,14 @@ export default function Home() {
               candidates.map((candidate) => (
                 <tr key={candidate._id}>
                   <td className="text-center">
-                    <img src="/img.jpg" alt="Candidate" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }} />
+                    <img 
+                      src={candidate.image?.url || "/img.jpg"} 
+                      alt={candidate.name} 
+                      style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%' }}
+                      onError={(e) => {
+                        e.target.src = "/img.jpg";
+                      }}
+                    />
                   </td>
                   <td>{candidate.name}</td>
                   <td>{candidate.age} years</td>

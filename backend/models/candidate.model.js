@@ -12,6 +12,16 @@ const  candidateSchema=new mongoose.Schema({
         type: Number,
         required:true
     },
+    image: {
+        public_id: {
+            type: String,
+            required: true
+        },
+        url: {
+            type: String,
+            required: true
+        }
+    },
     votes:[{
         user:{
             type:mongoose.Schema.Types.ObjectId,

@@ -3,6 +3,8 @@ const router = express.Router();
 const User = require('./../models/user.model');
 const {jwtAuthMiddleware, generateToken} = require('./../jwt');
 const Candidate = require('./../models/candidate.model');
+const cloudinary = require('cloudinary').v2;
+const path = require('path');
 
 
 const checkAdminRole = async (userID) => {
@@ -24,9 +26,37 @@ router.post('/', jwtAuthMiddleware, async (req, res) =>{
 
         const data = req.body // Assuming the request body contains the candidate data
 
+        // Check if image file is uploaded
+        if (!req.files || !req.files.image) {
+            return res.status(400).json({ error: "Image file is required" });
+        }
+
+        const image = req.files.image.tempFilePath;
+        const fileExtension = path.extname(req.files.image.name).toLowerCase(); // Extract file extension
+        const allowedExtensions = ['.png', '.jpg', '.jpeg'];
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            return res.status(400).json({ error: "Invalid image format. Only .png, .jpg, and .jpeg are allowed." });
+        }
+
+        // Upload image to Cloudinary
+        const cloud_response = await cloudinary.uploader.upload(image, {
+            folder: "candidates", // Optional: Specify folder in Cloudinary
+        });
+
+        if (!cloud_response) {
+            return res.status(500).json({ error: "Failed to upload image to Cloudinary" });
+        }
+
+        // Add image data to candidate data
+        data.image = {
+            public_id: cloud_response.public_id,
+            url: cloud_response.secure_url
+        };
+
         // Create a new User document using the Mongoose model
         const newCandidate = new Candidate(data);
-
+        
         // Save the new user to the database
         const response = await newCandidate.save();
         console.log('data saved');
@@ -40,11 +70,44 @@ router.post('/', jwtAuthMiddleware, async (req, res) =>{
 
 router.put('/:candidateID', jwtAuthMiddleware, async (req, res)=>{
     try{
-        if(!checkAdminRole(req.user.id))
+        if(!(await checkAdminRole(req.user.id)))
             return res.status(403).json({message: 'user does not have admin role'});
         
         const candidateID = req.params.candidateID; // Extract the id from the URL parameter
         const updatedCandidateData = req.body; // Updated data for the person
+
+        // Handle image upload if provided
+        if (req.files && req.files.image) {
+            const image = req.files.image.tempFilePath;
+            const fileExtension = path.extname(req.files.image.name).toLowerCase();
+            const allowedExtensions = ['.png', '.jpg', '.jpeg'];
+
+            if (!allowedExtensions.includes(fileExtension)) {
+                return res.status(400).json({ error: "Invalid image format. Only .png, .jpg, and .jpeg are allowed." });
+            }
+
+            // Get existing candidate to delete old image from Cloudinary
+            const existingCandidate = await Candidate.findById(candidateID);
+            if (existingCandidate && existingCandidate.image && existingCandidate.image.public_id) {
+                // Delete old image from Cloudinary
+                await cloudinary.uploader.destroy(existingCandidate.image.public_id);
+            }
+
+            // Upload new image to Cloudinary
+            const cloud_response = await cloudinary.uploader.upload(image, {
+                folder: "candidates",
+            });
+
+            if (!cloud_response) {
+                return res.status(500).json({ error: "Failed to upload image to Cloudinary" });
+            }
+
+            // Add new image data to update data
+            updatedCandidateData.image = {
+                public_id: cloud_response.public_id,
+                url: cloud_response.secure_url
+            };
+        }
 
         const response = await Candidate.findByIdAndUpdate(candidateID, updatedCandidateData, {
             new: true, // Return the updated document
@@ -66,16 +129,23 @@ router.put('/:candidateID', jwtAuthMiddleware, async (req, res)=>{
 
 router.delete('/:candidateID', jwtAuthMiddleware, async (req, res)=>{
     try{
-        if(!checkAdminRole(req.user.id))
+        if(!(await checkAdminRole(req.user.id)))
             return res.status(403).json({message: 'user does not have admin role'});
         
         const candidateID = req.params.candidateID; // Extract the id from the URL parameter
 
-        const response = await Candidate.findByIdAndDelete(candidateID);
-
-        if (!response) {
+        // Get candidate to delete image from Cloudinary
+        const candidate = await Candidate.findById(candidateID);
+        if (!candidate) {
             return res.status(404).json({ error: 'Candidate not found' });
         }
+
+        // Delete image from Cloudinary if it exists
+        if (candidate.image && candidate.image.public_id) {
+            await cloudinary.uploader.destroy(candidate.image.public_id);
+        }
+
+        const response = await Candidate.findByIdAndDelete(candidateID);
 
         console.log('candidate deleted');
         res.status(200).json(response);
