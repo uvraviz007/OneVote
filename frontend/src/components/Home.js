@@ -174,6 +174,7 @@ export default function Home() {
               <th scope="col">Name</th>
               <th scope="col">Age</th>
               <th scope="col">Party</th>
+              <th scope="col">Manifesto</th>
               <th scope="col" className="text-center">Action</th>
             </tr>
           </thead>
@@ -194,6 +195,41 @@ export default function Home() {
                   <td>{candidate.name}</td>
                   <td>{candidate.age} years</td>
                   <td>{candidate.party}</td>
+                  <td>
+                    {candidate.manifesto ? (
+                      <div>
+                        <span 
+                          title={candidate.manifesto}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            // Check if the manifesto is a URL
+                            if (candidate.manifesto.match(/^https?:\/\//)) {
+                              const confirmed = window.confirm(`You are about to be redirected to:\n${candidate.manifesto}\n\nDo you want to continue?`);
+                              if (confirmed) {
+                                window.open(candidate.manifesto, '_blank');
+                              }
+                            } else {
+                              alert(`Manifesto for ${candidate.name}:\n\n${candidate.manifesto}`);
+                            }
+                          }}
+                        >
+                          {candidate.manifesto.length > 50 
+                            ? `${candidate.manifesto.substring(0, 50)}...` 
+                            : candidate.manifesto
+                          }
+                        </span>
+                        <br />
+                        <small className="text-muted">
+                          {candidate.manifesto.match(/^https?:\/\//) 
+                            ? 'Click to visit manifesto website' 
+                            : 'Click to view full manifesto'
+                          }
+                        </small>
+                      </div>
+                    ) : (
+                      <span className="text-muted">No manifesto added</span>
+                    )}
+                  </td>
                   <td className="text-center">
                     {isAdmin ? (
                       <button className="btn btn-secondary" disabled>
@@ -216,7 +252,7 @@ export default function Home() {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center">No candidates available at the moment.</td>
+                <td colSpan="6" className="text-center">No candidates available at the moment.</td>
               </tr>
             )}
           </tbody>

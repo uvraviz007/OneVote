@@ -12,7 +12,8 @@ export default function AdminPanel() {
   const [formData, setFormData] = useState({
     name: '',
     party: '',
-    age: ''
+    age: '',
+    manifesto: ''
   });
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -93,6 +94,7 @@ export default function AdminPanel() {
       formDataToSend.append('name', formData.name);
       formDataToSend.append('party', formData.party);
       formDataToSend.append('age', formData.age);
+      formDataToSend.append('manifesto', formData.manifesto);
       formDataToSend.append('image', selectedImage);
 
       const response = await fetch('http://localhost:5000/candidate', {
@@ -108,7 +110,7 @@ export default function AdminPanel() {
       if (response.ok) {
         alert('Candidate added successfully!');
         setShowAddForm(false);
-        setFormData({ name: '', party: '', age: '' });
+        setFormData({ name: '', party: '', age: '', manifesto: '' });
         setSelectedImage(null);
         setImagePreview(null);
         // Refresh candidates list
@@ -136,6 +138,7 @@ export default function AdminPanel() {
       formDataToSend.append('name', formData.name);
       formDataToSend.append('party', formData.party);
       formDataToSend.append('age', formData.age);
+      formDataToSend.append('manifesto', formData.manifesto);
       if (selectedImage) {
         formDataToSend.append('image', selectedImage);
       }
@@ -153,7 +156,7 @@ export default function AdminPanel() {
       if (response.ok) {
         alert('Candidate updated successfully!');
         setEditingCandidate(null);
-        setFormData({ name: '', party: '', age: '' });
+        setFormData({ name: '', party: '', age: '', manifesto: '' });
         setSelectedImage(null);
         setImagePreview(null);
         // Refresh candidates list
@@ -212,16 +215,20 @@ export default function AdminPanel() {
     setFormData({
       name: candidate.name,
       party: candidate.party,
-      age: candidate.age.toString()
+      age: candidate.age.toString(),
+      manifesto: candidate.manifesto || ''
     });
     setSelectedImage(null);
     setImagePreview(candidate.image?.url || null);
+    
+    // Scroll to top of the screen
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancel = () => {
     setShowAddForm(false);
     setEditingCandidate(null);
-    setFormData({ name: '', party: '', age: '' });
+    setFormData({ name: '', party: '', age: '', manifesto: '' });
     setSelectedImage(null);
     setImagePreview(null);
   };
@@ -317,6 +324,19 @@ export default function AdminPanel() {
                   />
                 </div>
               </div>
+              <div className="row">
+                <div className="col-12 mb-3">
+                  <label className="form-label">Manifesto</label>
+                  <textarea
+                    className="form-control"
+                    name="manifesto"
+                    rows="3"
+                    value={formData.manifesto}
+                    onChange={handleChange}
+                    placeholder="Enter candidate manifesto (optional)"
+                  />
+                </div>
+              </div>
               {imagePreview && (
                 <div className="mb-3">
                   <label className="form-label">Image Preview:</label>
@@ -351,6 +371,7 @@ export default function AdminPanel() {
               <th scope="col">Name</th>
               <th scope="col">Age</th>
               <th scope="col">Party</th>
+              <th scope="col">Manifesto</th>
               <th scope="col" className="text-center">Actions</th>
             </tr>
           </thead>
@@ -371,6 +392,41 @@ export default function AdminPanel() {
                   <td>{candidate.name}</td>
                   <td>{candidate.age} years</td>
                   <td>{candidate.party}</td>
+                  <td>
+                    {candidate.manifesto ? (
+                      <div>
+                        <span 
+                          title={candidate.manifesto}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            // Check if the manifesto is a URL
+                            if (candidate.manifesto.match(/^https?:\/\//)) {
+                              const confirmed = window.confirm(`You are about to be redirected to:\n${candidate.manifesto}\n\nDo you want to continue?`);
+                              if (confirmed) {
+                                window.open(candidate.manifesto, '_blank');
+                              }
+                            } else {
+                              alert(`Manifesto for ${candidate.name}:\n\n${candidate.manifesto}`);
+                            }
+                          }}
+                        >
+                          {candidate.manifesto.length > 50 
+                            ? `${candidate.manifesto.substring(0, 50)}...` 
+                            : candidate.manifesto
+                          }
+                        </span>
+                        <br />
+                        <small className="text-muted">
+                          {candidate.manifesto.match(/^https?:\/\//) 
+                            ? 'Click to visit manifesto website' 
+                            : 'Click to view full manifesto'
+                          }
+                        </small>
+                      </div>
+                    ) : (
+                      <span className="text-muted">No manifesto added</span>
+                    )}
+                  </td>
                   <td className="text-center">
                     <div className="d-flex gap-2 justify-content-center">
                       <button 
@@ -391,7 +447,7 @@ export default function AdminPanel() {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center">No candidates available at the moment.</td>
+                <td colSpan="6" className="text-center">No candidates available at the moment.</td>
               </tr>
             )}
           </tbody>

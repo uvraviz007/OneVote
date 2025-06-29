@@ -54,6 +54,11 @@ router.post('/', jwtAuthMiddleware, async (req, res) =>{
             url: cloud_response.secure_url
         };
 
+        // Handle manifesto - if empty string, set to null
+        if (data.manifesto === '') {
+            data.manifesto = null;
+        }
+
         // Create a new User document using the Mongoose model
         const newCandidate = new Candidate(data);
         
@@ -107,6 +112,11 @@ router.put('/:candidateID', jwtAuthMiddleware, async (req, res)=>{
                 public_id: cloud_response.public_id,
                 url: cloud_response.secure_url
             };
+        }
+
+        // Handle manifesto - if empty string, set to null
+        if (updatedCandidateData.manifesto === '') {
+            updatedCandidateData.manifesto = null;
         }
 
         const response = await Candidate.findByIdAndUpdate(candidateID, updatedCandidateData, {

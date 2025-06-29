@@ -12,6 +12,10 @@ const  candidateSchema=new mongoose.Schema({
         type: Number,
         required:true
     },
+    manifesto: {
+        type: String,
+        default: null
+    },
     image: {
         public_id: {
             type: String,
