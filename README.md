@@ -45,16 +45,16 @@
 ## 🖼️ Screenshots
 
 ### 🗳️ Candidate Voting Page
-![Voting Page](./screenshots/voting-page.png)
+![Voting Page](./images/voting-page.png)
 
 ### 📊 Live Vote Count
-![Vote Count](./screenshots/vote-count.png)
+![Vote Count](./images/vote-count.png)
 
 ### 🛠️ Admin Panel - Manage Candidates
-![Admin Panel](./screenshots/admin-panel.png)
+![Admin Panel](./images/admin-panel.png)
 
 ### ➕ Add New Candidate Form
-![Add Candidate](./screenshots/add-candidate.png)
+![Add Candidate](./images/add-candidate.png)
 
 > 💡 *Make sure these images are inside a folder named `screenshots/` at the root of your project.*
 
