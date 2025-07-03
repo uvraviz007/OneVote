@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../api';
 
 export default function Count() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -9,7 +10,7 @@ export default function Count() {
   // Fetch vote counts from API
   const fetchVoteCounts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/candidate/vote/count');
+      const response = await apiFetch('/candidate/vote/count');
       
       if (response.ok) {
         const data = await response.json();

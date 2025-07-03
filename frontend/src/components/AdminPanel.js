@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../api';
 
 export default function AdminPanel() {
   const [candidates, setCandidates] = useState([]);
@@ -43,7 +44,7 @@ export default function AdminPanel() {
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const response = await fetch('http://localhost:5000/candidate/allcandidates');
+        const response = await apiFetch('/candidate/allcandidates');
         if (response.ok) {
           const data = await response.json();
           setCandidates(data);
@@ -97,7 +98,7 @@ export default function AdminPanel() {
       formDataToSend.append('manifesto', formData.manifesto);
       formDataToSend.append('image', selectedImage);
 
-      const response = await fetch('http://localhost:5000/candidate', {
+      const response = await apiFetch('/candidate', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -143,7 +144,7 @@ export default function AdminPanel() {
         formDataToSend.append('image', selectedImage);
       }
 
-      const response = await fetch(`http://localhost:5000/candidate/${editingCandidate._id}`, {
+      const response = await apiFetch(`/candidate/${editingCandidate._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -182,7 +183,7 @@ export default function AdminPanel() {
     const token = localStorage.getItem('token');
     
     try {
-      const response = await fetch(`http://localhost:5000/candidate/${candidateId}`, {
+      const response = await apiFetch(`/candidate/${candidateId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

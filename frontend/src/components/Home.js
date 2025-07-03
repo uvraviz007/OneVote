@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../api';
 
 export default function Home() {
   const [candidates, setCandidates] = useState([]);
@@ -28,7 +29,7 @@ export default function Home() {
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const response = await fetch('http://localhost:5000/candidate/allcandidates');
+        const response = await apiFetch('/candidate/allcandidates');
         if (response.ok) {
           const data = await response.json();
           setCandidates(data);
@@ -51,7 +52,7 @@ export default function Home() {
       const token = localStorage.getItem('token');
       if (!token) return;
       try {
-        const response = await fetch('http://localhost:5000/user/profile', {
+        const response = await apiFetch('/user/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -112,7 +113,7 @@ export default function Home() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/candidate/vote/${candidate._id}`, {
+      const response = await apiFetch(`/candidate/vote/${candidate._id}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

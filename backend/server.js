@@ -42,7 +42,7 @@ app.use('/candidate', candidateRoutes);
 
 app.get('/', (req,res)=>{
     // console.log("welcome to voting machine");
-    res.send("welocme to 5th election fare");
+    res.send("welocme to OneVote Backend");
 });
 
 // Use the routers

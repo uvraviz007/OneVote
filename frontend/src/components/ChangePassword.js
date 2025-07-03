@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../api';
 
 export default function ChangePassword() {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ export default function ChangePassword() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/user/profile/password', {
+      const response = await apiFetch('/user/profile/password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiFetch } from '../api';
 
 export default function Profile() {
   const [userData, setUserData] = useState(null);
@@ -14,24 +15,19 @@ export default function Profile() {
       return;
     }
 
-    fetch('http://localhost:3001/user/profile', {
+    const response = apiFetch('/user/profile', {
       headers: {
         Authorization: `Bearer ${token}`
       }
+    });
+
+    response.then(data => {
+      setUserData(data.user);
     })
-      .then(res => { 
-        if (!res.ok) {
-          throw new Error("Failed to fetch profile");
-        }
-        return res.json();
-      })
-      .then(data => {
-        setUserData(data.user);
-      })
-      .catch(err => {
-        console.error(err);
-        setError("Failed to load profile");
-      });
+    .catch(err => {
+      console.error(err);
+      setError("Failed to load profile");
+    });
   }, []);
 
   if (error) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // for navigation
+import { apiFetch } from '../api';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -22,7 +23,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/user/login', {
+      const response = await apiFetch('/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -45,7 +46,7 @@ export default function Login() {
         window.dispatchEvent(new Event('loginStateChanged'));
 
         // Check if user is admin by fetching profile
-        const profileResponse = await fetch('http://localhost:5000/user/profile', {
+        const profileResponse = await apiFetch('/user/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${result.token}`,

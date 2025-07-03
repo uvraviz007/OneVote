@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { apiFetch } from '../api';
 
 export default function Account() {
   const [userData, setUserData] = useState(null);
@@ -18,7 +19,7 @@ export default function Account() {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/user/profile', {
+        const response = await apiFetch('/user/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

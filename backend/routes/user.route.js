@@ -7,6 +7,17 @@ const {jwtAuthMiddleware,generateToken}=require('./../jwt');
 router.post('/signup', async (req, res) => {
     try {
         const data = req.body;
+        // Check if user with same adharId, email, or mobile exists
+        const existingUser = await User.findOne({
+            $or: [
+                { adharId: data.adharId },
+                { email: data.email },
+                { mobile: data.mobile }
+            ]
+        });
+        if (existingUser) {
+            return res.status(409).json({ error: 'User with this Aadhar number, email, or mobile already exists' });
+        }
         const newUser = new User(data);
         const response = await newUser.save();
         console.log('data saved');

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../api';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/user/signup', {
+      const response = await apiFetch('/user/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
