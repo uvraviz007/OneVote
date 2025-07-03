@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Check login status on load and listen for changes
   useEffect(() => {
@@ -81,44 +82,52 @@ export default function Navbar() {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav">
-            {!isAdmin && (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/">Home</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/vote-count">Vote Count</Link>
-                </li>
-              </>
-            )}
-            {isLoggedIn && !isAdmin && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/account">Account</Link>
-              </li>
-            )}
-            {isLoggedIn && isAdmin && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/admin-panel">Admin Panel</Link>
-              </li>
-            )}
-          </ul>
-
-          <div className="ms-auto d-flex gap-2">
-            {isLoggedIn ? (
-              <button
-                className="btn btn-outline-danger btn-sm"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            ) : (
-              <>
-                <Link className="nav-link" to="/login">Login</Link>
-                <Link className="nav-link" to="/signup">Signup</Link>
-              </>
-            )}
-          </div>
+          {(location.pathname === '/login' || location.pathname === '/signup') ? (
+            <div className="ms-auto">
+              <Link className="btn btn-secondary" to="/">
+                Home
+              </Link>
+            </div>
+          ) : isLoggedIn ? (
+            <>
+              <ul className="navbar-nav">
+                {!isAdmin && (
+                  <>
+                    <li className="nav-item">
+                      <Link className="nav-link" to="/">Home</Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link className="nav-link" to="/vote-count">Vote Count</Link>
+                    </li>
+                  </>
+                )}
+                {isLoggedIn && !isAdmin && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/account">Account</Link>
+                  </li>
+                )}
+                {isLoggedIn && isAdmin && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/admin-panel">Admin Panel</Link>
+                  </li>
+                )}
+              </ul>
+              <div className="ms-auto d-flex gap-2">
+                <button
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="ms-auto">
+              <Link className="btn btn-primary" to="/signup">
+                Let's register yourself to vote
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </nav>
